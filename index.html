@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</h1>
+    <form id="bookingForm">
+      <label>ชื่อ-นามสกุล
+        <input type="text" id="name" required>
+      </label>
+      <label>เบอร์โทรศัพท์
+        <input type="tel" id="phone" required pattern="[0-9]{9,}">
+      </label>
+      <label>Line ID
+        <input type="text" id="line" required>
+      </label>
+      <label>วันที่ต้องการจอง
+        <input type="date" id="date" required min="">
+      </label>
+      <label>เวลาที่ต้องการจอง
+        <select id="time" required>
+          <option value="">-- เลือกเวลา --</option>
+        </select>
+      </label>
+      <div id="holidayMsg" class="holiday-msg"></div>
+      <label class="checkbox">
+        <input type="checkbox" id="priceConfirm">
+        <span>ฉันรับทราบและยอมรับราคาค่าดูดวง</span>
+      </label>
+      <button type="submit" id="submitBtn" disabled>จองคิว</button>
+    </form>
+    <div id="resultMsg"></div>
+    <div id="qrPopup" class="modal">
+      <div class="modal-content">
+        <span id="closeQR" class="close">&times;</span>
+        <h2>QR Code ชำระเงิน</h2>
+        <img id="qrImg" src="" alt="QR Code">
+      </div>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
