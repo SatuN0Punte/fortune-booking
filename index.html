@@ -1,48 +1,57 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</title>
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main>
+  <main class="container">
     <h1>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</h1>
-    <form id="bookingForm">
-      <label>ชื่อ-นามสกุล
-        <input type="text" id="name" required>
-      </label>
-      <label>เบอร์โทรศัพท์
-        <input type="tel" id="phone" required pattern="[0-9]{9,}">
-      </label>
-      <label>Line ID
-        <input type="text" id="line" required>
-      </label>
-      <label>วันที่ต้องการจอง
-        <input type="date" id="date" required min="">
-      </label>
-      <label>เวลาที่ต้องการจอง
-        <select id="time" required>
-          <option value="">-- เลือกเวลา --</option>
-        </select>
-      </label>
-      <div id="holidayMsg" class="holiday-msg"></div>
-      <label class="checkbox">
-        <input type="checkbox" id="priceConfirm">
-        <span>ฉันรับทราบและยอมรับราคาค่าดูดวง</span>
-      </label>
-      <button type="submit" id="submitBtn" disabled>จองคิว</button>
-    </form>
-    <div id="resultMsg"></div>
-    <div id="qrPopup" class="modal">
-      <div class="modal-content">
-        <span id="closeQR" class="close">&times;</span>
-        <h2>QR Code ชำระเงิน</h2>
-        <img id="qrImg" src="" alt="QR Code">
+    <p class="tagline">เปิดดวงด้วยญาณทิพย์ มั่นใจได้ด้วยประสบการณ์</p>
+
+    <form id="bookingForm" autocomplete="off">
+      <div class="form-group">
+        <label for="name">ชื่อ-นามสกุล</label>
+        <input type="text" id="name" name="name" placeholder="กรอกชื่อเต็มของคุณ" required />
       </div>
-    </div>
+      <div class="form-group">
+        <label for="phone">เบอร์โทร</label>
+        <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
+      </div>
+      <div class="form-group">
+        <label for="lineId">Line ID</label>
+        <input type="text" id="lineId" name="lineId" placeholder="Line ID ของคุณ" />
+      </div>
+
+      <div class="form-group datetime-group">
+        <div>
+          <label for="date">วันที่</label>
+          <input type="date" id="date" name="date" required />
+        </div>
+        <div>
+          <label for="time">เวลา</label>
+          <select id="time" name="time" required>
+            <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn">จองคิว</button>
+
+      <div id="loader" class="loader hidden"></div>
+    </form>
+
+    <section id="confirmation" class="hidden">
+      <h2>รายละเอียดการจอง</h2>
+      <p>ขอบคุณที่จองคิวกับแม่มุกดา กรุณาแคปหน้าจอและส่งทางไลน์เพื่อยืนยัน</p>
+      <div id="confirmDetails"></div>
+      <button id="bookAgainBtn">จองคิวใหม่</button>
+    </section>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
