@@ -1,186 +1,123 @@
-/* Reset & base */
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0; padding: 0;
-  font-family: 'Prompt', sans-serif;
-  background: #FAFAFA;
-  color: #333;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 24px 12px;
-}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>จองคิวดูดวงแม่มุกดา</title>
+  <style>
+    body {
+      font-family: "Sarabun", sans-serif;
+      background: #f9f9f9;
+      margin: 0; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+    h1 {
+      text-align: center;
+      color: #5b2c6f;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #5a5a5a;
+      font-weight: 600;
+    }
+    input[type="text"], input[type="tel"], input[type="date"], input[type="time"] {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus, input[type="tel"]:focus, input[type="date"]:focus, input[type="time"]:focus {
+      border-color: #9b59b6;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #9b59b6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #7d3c98;
+    }
+    #result {
+      margin-top: 1rem;
+      font-weight: 600;
+      text-align: center;
+      color: #27ae60;
+      min-height: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>จองคิวดูดวงแม่มุกดา</h1>
+    <form id="bookingForm">
+      <label for="name">ชื่อ</label>
+      <input type="text" name="name" id="name" required />
 
-/* Colors */
-:root {
-  --color-primary: #1A237E; /* น้ำเงินเข้ม */
-  --color-accent: #6A1B9A;  /* ม่วง */
-  --color-gold: #FFD700;    /* ทอง */
-  --color-bg: #FAFAFA;
-  --color-text: #333;
-}
+      <label for="phone">เบอร์โทร</label>
+      <input type="tel" name="phone" id="phone" required />
 
-/* Container */
-.container {
-  max-width: 420px;
-  background: #fff;
-  padding: 28px 32px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(26, 35, 126, 0.15);
-}
+      <label for="date">วันที่</label>
+      <input type="date" name="date" id="date" required />
 
-/* Header */
-h1 {
-  color: var(--color-primary);
-  text-align: center;
-  margin-bottom: 6px;
-  font-weight: 700;
-  font-size: 1.8rem;
-}
-.tagline {
-  text-align: center;
-  font-style: italic;
-  color: var(--color-accent);
-  margin-bottom: 24px;
-}
+      <label for="time">เวลา</label>
+      <input type="time" name="time" id="time" required />
 
-/* Form */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
+      <button type="submit">จองคิว</button>
+    </form>
+    <div id="result"></div>
+  </div>
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzVjgsGv5g_8zdTV_f5kEDL9yhzCkvmxD9aImMjrCaujhj0le9uA0uHTgPus_ImL1aK/exec';
 
-.form-group label {
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: var(--color-primary);
-}
+    const form = document.getElementById('bookingForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-input[type="text"],
-input[type="tel"],
-input[type="date"],
-select {
-  padding: 10px 14px;
-  border: 2px solid var(--color-primary);
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
+      const data = {
+        name: form.name.value.trim(),
+        phone: form.phone.value.trim(),
+        date: form.date.value,
+        time: form.time.value,
+      };
 
-input[type="text"]:focus,
-input[type="tel"]:focus,
-input[type="date"]:focus,
-select:focus {
-  outline: none;
-  border-color: var(--color-gold);
-  box-shadow: 0 0 8px var(--color-gold);
-}
+      if (!data.name || !data.phone || !data.date || !data.time) {
+        document.getElementById('result').innerText = 'กรุณากรอกข้อมูลให้ครบทุกช่อง';
+        return;
+      }
 
-/* Date & Time group side by side */
-.datetime-group {
-  display: flex;
-  gap: 12px;
-}
-.datetime-group > div {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
 
-/* Button */
-button#submitBtn {
-  background: linear-gradient(45deg, var(--color-primary), var(--color-accent));
-  color: white;
-  font-weight: 700;
-  font-size: 1.2rem;
-  padding: 14px 0;
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
-  box-shadow: 0 6px 14px rgba(106, 27, 154, 0.5);
-  transition: background 0.3s ease;
-}
-
-button#submitBtn:hover {
-  background: var(--color-gold);
-  color: #000;
-}
-
-/* Loader */
-.loader {
-  margin: 16px auto 0;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--color-primary);
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  animation: spin 1s linear infinite;
-}
-
-.hidden {
-  display: none;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Confirmation */
-#confirmation {
-  text-align: center;
-  margin-top: 24px;
-  color: var(--color-primary);
-}
-
-#confirmDetails {
-  background: #f0e6ff;
-  border: 2px solid var(--color-accent);
-  padding: 16px;
-  margin: 16px 0;
-  border-radius: 12px;
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-button#bookAgainBtn {
-  background: var(--color-gold);
-  color: #000;
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-button#bookAgainBtn:hover {
-  background: var(--color-primary);
-  color: white;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .container {
-    padding: 20px 18px;
-  }
-  h1 {
-    font-size: 1.5rem;
-  }
-  button#submitBtn {
-    font-size: 1rem;
-  }
-  .datetime-group {
-    flex-direction: column;
-  }
-}
+      const result = await res.json();
+      document.getElementById('result').innerText = result.message;
+      if (result.status === 'success') {
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>
