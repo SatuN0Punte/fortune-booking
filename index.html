@@ -1,200 +1,92 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --color-primary: #1A237E;   /* น้ำเงินเข้ม */
-      --color-accent: #6A1B9A;    /* ม่วง */
-      --color-gold: #FFD700;      /* ทอง */
-      --color-bg: #F9F9FA;
-      --color-text: #222;
-      --border-radius: 12px;
-      --transition-speed: 0.3s;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 24px 12px;
-      font-family: 'Prompt', sans-serif;
-      background: var(--color-bg);
-      color: var(--color-text);
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 420px; width: 100%;
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 6px rgba(26, 35, 126, 0.12), 0 6px 12px rgba(106, 27, 154, 0.12);
-      padding: 32px 28px;
-      display: flex;
-      flex-direction: column;
-    }
-    h1 {
-      margin: 0 0 24px 0;
-      font-weight: 700; font-size: 1.9rem;
-      color: var(--color-primary);
-      text-align: center;
-    }
-    form { display: flex; flex-direction: column; gap: 20px; }
-    label {
-      font-weight: 600; font-size: 0.95rem;
-      color: var(--color-primary); margin-bottom: 6px;
-      display: block;
-    }
-    input[type="text"], input[type="tel"], input[type="date"], select {
-      width: 100%; padding: 12px 14px;
-      border: 1.8px solid #ccc; border-radius: var(--border-radius);
-      font-size: 1rem; color: var(--color-text);
-      background: #fff;
-      transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--color-gold);
-      box-shadow: 0 0 8px var(--color-gold);
-    }
-    .datetime-group { display: flex; gap: 16px; }
-    .datetime-group > div { flex: 1; display: flex; flex-direction: column; }
+<!-- ✅ FORM: ไม่มี Line ID + ป้องกันข้อมูลว่าง -->
+<form id="bookingForm" autocomplete="off" novalidate>
+  <div>
+    <label for="name">ชื่อ-นามสกุล</label>
+    <input type="text" id="name" name="name" placeholder="กรอกชื่อเต็มของคุณ" required />
+  </div>
+  <div>
+    <label for="phone">เบอร์โทร</label>
+    <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
+  </div>
 
-    button#submitBtn {
-      margin-top: 12px;
-      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-      border: none; border-radius: var(--border-radius);
-      padding: 14px 0; color: #fff;
-      font-weight: 700; font-size: 1.2rem;
-      box-shadow: 0 5px 12px rgba(106, 27, 154, 0.5);
-      cursor: pointer;
-      transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  <div class="datetime-group">
+    <div>
+      <label for="date">วันที่</label>
+      <input type="date" id="date" name="date" required />
+    </div>
+    <div>
+      <label for="time">เวลา</label>
+      <select id="time" name="time" required>
+        <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+      </select>
+    </div>
+  </div>
+
+  <button type="submit" id="submitBtn">จองคิว</button>
+  <div id="loader" class="loader"></div>
+</form>
+
+<section id="confirmation" aria-live="polite" role="region" aria-atomic="true">
+  <div id="confirmDetails"></div>
+  <button id="bookAgainBtn" type="button">จองคิวใหม่</button>
+</section>
+
+<script>
+  const form = document.getElementById('bookingForm');
+  const loader = document.getElementById('loader');
+  const confirmation = document.getElementById('confirmation');
+  const confirmDetails = document.getElementById('confirmDetails');
+  const bookAgainBtn = document.getElementById('bookAgainBtn');
+  const timeSelect = document.getElementById('time');
+  const dateInput = document.getElementById('date');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = form.name.value.trim();
+    const phone = form.phone.value.trim();
+    const date = form.date.value;
+    const time = form.time.value;
+
+    if (!name || !phone || !date || !time) {
+      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      return;
     }
-    button#submitBtn:hover {
-      background: var(--color-gold);
-      color: #000;
-      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.8);
-    }
-    .loader {
-      margin: 18px auto 0; border: 4px solid #eee;
-      border-top: 4px solid var(--color-primary); border-radius: 50%;
-      width: 36px; height: 36px;
-      animation: spin 1s linear infinite;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    }
-    .loader.visible { opacity: 1; pointer-events: auto; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    #confirmation {
-      margin-top: 28px; text-align: center; color: var(--color-primary);
-      font-weight: 600; display: none; flex-direction: column; gap: 14px;
-    }
-    #confirmation.visible { display: flex; }
-    #confirmDetails {
-      border: 1.5px solid var(--color-accent); background: #f3e9ff;
-      padding: 18px 22px; border-radius: var(--border-radius);
-      font-size: 1.05rem; word-break: break-word;
-    }
-    button#bookAgainBtn {
-      background: var(--color-gold); border: none; border-radius: var(--border-radius);
-      padding: 12px 28px; font-weight: 700; font-size: 1.1rem;
-      cursor: pointer; transition: background 0.3s ease;
-    }
-    button#bookAgainBtn:hover {
-      background: var(--color-primary); color: #fff;
-    }
-    @media (max-width: 480px) {
-      .datetime-group { flex-direction: column; }
-      .container { padding: 24px 20px; }
-      h1 { font-size: 1.6rem; }
-      button#submitBtn { font-size: 1.1rem; }
-    }
-  </style>
-</head>
-<body>
-  <main class="container">
-    <h1>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</h1>
 
-    <form id="bookingForm" autocomplete="off" novalidate>
-      <div>
-        <label for="name">ชื่อ-นามสกุล</label>
-        <input type="text" id="name" name="name" placeholder="กรอกชื่อเต็มของคุณ" required />
-      </div>
-      <div>
-        <label for="phone">เบอร์โทร</label>
-        <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
-      </div>
+    loader.classList.add('visible');
 
-      <div class="datetime-group">
-        <div>
-          <label for="date">วันที่</label>
-          <input type="date" id="date" name="date" required />
-        </div>
-        <div>
-          <label for="time">เวลา</label>
-          <select id="time" name="time" required>
-            <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
-          </select>
-        </div>
-      </div>
+    setTimeout(() => {
+      loader.classList.remove('visible');
+      form.style.display = 'none';
+      confirmation.classList.add('visible');
+      confirmDetails.textContent = `
+        ชื่อ: ${name}
+        เบอร์โทร: ${phone}
+        วันที่: ${date}
+        เวลา: ${time}
+      `;
+    }, 1500);
+  });
 
-      <button type="submit" id="submitBtn">จองคิว</button>
-      <div id="loader" class="loader"></div>
-    </form>
+  bookAgainBtn.addEventListener('click', () => {
+    confirmation.classList.remove('visible');
+    form.style.display = '';
+    form.reset();
+    timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
+  });
 
-    <section id="confirmation" aria-live="polite" role="region" aria-atomic="true">
-      <div id="confirmDetails"></div>
-      <button id="bookAgainBtn" type="button">จองคิวใหม่</button>
-    </section>
-  </main>
+  dateInput.addEventListener('change', async () => {
+    loader.classList.add('visible');
+    timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
 
-  <script>
-    const form = document.getElementById('bookingForm');
-    const loader = document.getElementById('loader');
-    const confirmation = document.getElementById('confirmation');
-    const confirmDetails = document.getElementById('confirmDetails');
-    const bookAgainBtn = document.getElementById('bookAgainBtn');
-    const timeSelect = document.getElementById('time');
-    const dateInput = document.getElementById('date');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      loader.classList.add('visible');
-
-      setTimeout(() => {
-        loader.classList.remove('visible');
-        form.style.display = 'none';
-        confirmation.classList.add('visible');
-        confirmDetails.textContent = `
-          ชื่อ: ${form.name.value}
-          เบอร์โทร: ${form.phone.value}
-          วันที่: ${form.date.value}
-          เวลา: ${form.time.value}
-        `;
-      }, 1500);
-    });
-
-    bookAgainBtn.addEventListener('click', () => {
-      confirmation.classList.remove('visible');
-      form.style.display = '';
-      form.reset();
-      timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
-    });
-
-    dateInput.addEventListener('change', async () => {
-      loader.classList.add('visible');
-      timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
-
-      setTimeout(() => {
-        loader.classList.remove('visible');
-        timeSelect.innerHTML = `
-          <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
-          <option value="10:00">10:00</option>
-          <option value="10:30">10:30</option>
-          <option value="11:00">11:00</option>
-        `;
-      }, 1000);
-    });
-  </script>
-</body>
-</html>
+    setTimeout(() => {
+      loader.classList.remove('visible');
+      timeSelect.innerHTML = `
+        <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+        <option value="10:00">10:00</option>
+        <option value="10:30">10:30</option>
+        <option value="11:00">11:00</option>
+      `;
+    }, 1000);
+  });
+</script>
