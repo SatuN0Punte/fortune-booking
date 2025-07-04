@@ -36,7 +36,13 @@ dateInput.addEventListener('change', async () => {
   timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
 
   try {
-    const response = await fetch(`${CONFIG.API_URL}?action=getAvailableSlots&date=${dateInput.value}`);
+    const response = await fetch(`${CONFIG.API_URL}?action=getAvailableSlots&date=${dateInput.value}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      mode: 'cors',
+    });
     const data = await response.json();
 
     if (data.status === 'success') {
@@ -81,6 +87,7 @@ form.addEventListener('submit', async (e) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(bookingData),
+      mode: 'cors',
     });
     const data = await response.json();
 
