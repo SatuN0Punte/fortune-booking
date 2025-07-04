@@ -3,69 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>จองคิวดูดวงแม่มุกดา</title>
-  <style>
-    body {
-      font-family: "Sarabun", sans-serif;
-      background: #f9f9f9;
-      margin: 0; padding: 0;
-      display: flex; justify-content: center; align-items: center;
-      height: 100vh;
-    }
-    .container {
-      background: white;
-      padding: 2rem 3rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 350px;
-    }
-    h1 {
-      text-align: center;
-      color: #5b2c6f;
-      margin-bottom: 1.5rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.3rem;
-      color: #5a5a5a;
-      font-weight: 600;
-    }
-    input[type="text"], input[type="tel"], input[type="date"], input[type="time"] {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      margin-bottom: 1rem;
-      border: 1.5px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-      box-sizing: border-box;
-      transition: border-color 0.3s;
-    }
-    input[type="text"]:focus, input[type="tel"]:focus, input[type="date"]:focus, input[type="time"]:focus {
-      border-color: #9b59b6;
-      outline: none;
-    }
-    button {
-      width: 100%;
-      padding: 0.8rem;
-      background-color: #9b59b6;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      font-weight: 700;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #7d3c98;
-    }
-    #result {
-      margin-top: 1rem;
-      font-weight: 600;
-      text-align: center;
-      color: #27ae60;
-      min-height: 1.5rem;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
@@ -88,36 +26,6 @@
     <div id="result"></div>
   </div>
 
-  <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzVjgsGv5g_8zdTV_f5kEDL9yhzCkvmxD9aImMjrCaujhj0le9uA0uHTgPus_ImL1aK/exec';
-
-    const form = document.getElementById('bookingForm');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const data = {
-        name: form.name.value.trim(),
-        phone: form.phone.value.trim(),
-        date: form.date.value,
-        time: form.time.value,
-      };
-
-      if (!data.name || !data.phone || !data.date || !data.time) {
-        document.getElementById('result').innerText = 'กรุณากรอกข้อมูลให้ครบทุกช่อง';
-        return;
-      }
-
-      const res = await fetch(GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-
-      const result = await res.json();
-      document.getElementById('result').innerText = result.message;
-      if (result.status === 'success') {
-        form.reset();
-      }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
