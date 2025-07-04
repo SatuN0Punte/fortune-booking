@@ -1,3 +1,4 @@
+/* styles.css */
 /* Reset & base */
 * {
   box-sizing: border-box;
@@ -184,3 +185,4 @@ button#bookAgainBtn:hover {
     flex-direction: column;
   }
 }
+
