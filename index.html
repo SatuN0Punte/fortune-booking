@@ -4,42 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="container">
     <h1>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</h1>
 
-    <form id="bookingForm" autocomplete="off" novalidate>
-      <div>
-        <label for="name">ชื่อ-นามสกุล</label>
-        <input type="text" id="name" name="name" placeholder="กรอกชื่อเต็มของคุณ" required />
-      </div>
-      <div>
-        <label for="phone">เบอร์โทร</label>
-        <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
-      </div>
+    <form id="bookingForm" autocomplete="off">
+      <label>
+        ชื่อ-นามสกุล
+        <input type="text" id="name" required placeholder="กรอกชื่อ-นามสกุล">
+      </label>
+
+      <label>
+        เบอร์โทร
+        <input type="tel" id="phone" required placeholder="เช่น 0812345678">
+      </label>
 
       <div class="datetime-group">
-        <div>
-          <label for="date">วันที่</label>
-          <input type="date" id="date" name="date" required />
-        </div>
-        <div>
-          <label for="time">เวลา</label>
-          <select id="time" name="time" required>
-            <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+        <label>
+          วันที่
+          <input type="date" id="date" required>
+        </label>
+        <label>
+          เวลา
+          <select id="time" required>
+            <option value="">-- เลือกเวลา --</option>
           </select>
-        </div>
+        </label>
       </div>
 
       <button type="submit" id="submitBtn" disabled>จองคิว</button>
-      <div id="loader" class="loader"></div>
+      <div class="loader"></div>
     </form>
 
-    <section id="confirmation">
-      <div id="confirmDetails"></div>
-      <button id="bookAgainBtn" type="button">จองคิวใหม่</button>
+    <section id="confirmation" class="hidden">
+      <h2>จองคิวสำเร็จ!</h2>
+      <pre id="confirmDetails"></pre>
+      <button id="bookAgainBtn">จองใหม่</button>
     </section>
   </main>
 
