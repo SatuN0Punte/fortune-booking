@@ -1,6 +1,5 @@
-// ✅ CONFIG API_URL ใหม่
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbxPi9s7qb09ltC7FmbfK92jTE7UCpep9nfYYG1rDcqv7o7p01gAhIgtkck4CcjSFkIGNg/exec',
+  API_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec',
 };
 
 const form = document.getElementById('bookingForm');
@@ -14,7 +13,14 @@ const submitBtn = document.getElementById('submitBtn');
 const nameInput = document.getElementById('name');
 const phoneInput = document.getElementById('phone');
 
-// ✅ ฟังก์ชันตรวจสอบฟอร์มครบถ้วน
+// ตั้งค่าวันต่ำสุดเป็นวันนี้
+function setMinDate() {
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.min = today;
+}
+setMinDate();
+
+// ตรวจสอบฟอร์มว่าครบถ้วน
 function checkFormValid() {
   const nameValid = nameInput.value.trim() !== '';
   const phoneValid = /^[0-9]{9,10}$/.test(phoneInput.value);
@@ -24,25 +30,24 @@ function checkFormValid() {
   submitBtn.disabled = !(nameValid && phoneValid && dateValid && timeValid);
 }
 
-// ✅ ตรวจสอบฟอร์มเมื่อมีการเปลี่ยนแปลง
+// ตรวจสอบฟอร์มเมื่อมีการเปลี่ยนแปลง
 [nameInput, phoneInput, dateInput, timeSelect].forEach(el => {
   el.addEventListener('input', checkFormValid);
   el.addEventListener('change', checkFormValid);
 });
 
-// ✅ โหลดเวลาว่างเมื่อเลือกวันที่
-dateInput.addEventListener('change', async () => {
-  if (!dateInput.value) return;
-
-  loader.classList.add('visible');
-  timeSelect.innerHTML = '<option disabled selected>กำลังโหลดเวลาว่าง...</option>';
+// โหลดเวลาว่างจาก backend
+async function loadAvailableSlots(date) {
+  loader.classList.remove('hidden');
+  timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
 
   try {
-    const response = await fetch(`${CONFIG.API_URL}?action=getAvailableSlots&date=${dateInput.value}`);
-    const data = await response.json();
+    const res = await fetch(`${CONFIG.API_URL}?action=getAvailableSlots&date=${date}`);
+    if (!res.ok) throw new Error('HTTP error ' + res.status);
+    const data = await res.json();
 
     if (data.status === 'success') {
-      if (data.slots && data.slots.length > 0) {
+      if (data.slots.length > 0) {
         timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
         data.slots.forEach(slot => {
           const option = document.createElement('option');
@@ -51,26 +56,33 @@ dateInput.addEventListener('change', async () => {
           timeSelect.appendChild(option);
         });
       } else {
-        timeSelect.innerHTML = '<option value="" disabled selected>ไม่มีเวลาว่างในวันนี้</option>';
+        timeSelect.innerHTML = '<option disabled selected>ไม่มีเวลาว่างในวันนี้</option>';
       }
     } else {
-      timeSelect.innerHTML = '<option value="" disabled selected>โหลดเวลาว่างล้มเหลว</option>';
+      timeSelect.innerHTML = '<option disabled selected>โหลดเวลาว่างล้มเหลว</option>';
       alert(data.message || 'โหลดเวลาว่างล้มเหลว');
     }
   } catch (error) {
-    timeSelect.innerHTML = '<option value="" disabled selected>โหลดเวลาว่างล้มเหลว</option>';
+    timeSelect.innerHTML = '<option disabled selected>โหลดเวลาว่างล้มเหลว</option>';
     alert('เกิดข้อผิดพลาดในการโหลดเวลาว่าง');
+    console.error(error);
+  } finally {
+    loader.classList.add('hidden');
+    checkFormValid();
   }
+}
 
-  loader.classList.remove('visible');
-  checkFormValid();
+// เมื่อเลือกวันใหม่ ให้โหลดเวลาว่าง
+dateInput.addEventListener('change', () => {
+  if (!dateInput.value) return;
+  loadAvailableSlots(dateInput.value);
 });
 
-// ✅ ส่งข้อมูลจองคิว
-form.addEventListener('submit', async (e) => {
+// ส่งข้อมูลจอง
+form.addEventListener('submit', async e => {
   e.preventDefault();
   submitBtn.disabled = true;
-  loader.classList.add('visible');
+  loader.classList.remove('hidden');
 
   const bookingData = {
     name: nameInput.value.trim(),
@@ -80,17 +92,18 @@ form.addEventListener('submit', async (e) => {
   };
 
   try {
-    const response = await fetch(CONFIG.API_URL, {
+    const res = await fetch(CONFIG.API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(bookingData),
     });
-    const data = await response.json();
+    if (!res.ok) throw new Error('HTTP error ' + res.status);
+    const data = await res.json();
 
     if (data.status === 'success') {
-      form.style.display = 'none';
-      confirmation.classList.add('visible');
-      confirmDetails.textContent =
+      form.classList.add('hidden');
+      confirmation.classList.remove('hidden');
+      confirmDetails.textContent = 
         `ชื่อ: ${bookingData.name}\n` +
         `เบอร์โทร: ${bookingData.phone}\n` +
         `วันที่: ${bookingData.date}\n` +
@@ -100,20 +113,21 @@ form.addEventListener('submit', async (e) => {
     }
   } catch (error) {
     alert('เกิดข้อผิดพลาดในการส่งข้อมูลจองคิว');
+    console.error(error);
+  } finally {
+    loader.classList.add('hidden');
+    submitBtn.disabled = false;
   }
-
-  loader.classList.remove('visible');
-  submitBtn.disabled = false;
 });
 
-// ✅ ปุ่มจองใหม่
+// ปุ่มจองใหม่
 bookAgainBtn.addEventListener('click', () => {
-  confirmation.classList.remove('visible');
-  form.style.display = '';
+  confirmation.classList.add('hidden');
+  form.classList.remove('hidden');
   form.reset();
   timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
   submitBtn.disabled = true;
 });
 
-// ✅ เริ่มต้นปิดปุ่ม submit
+// เริ่มต้น disable ปุ่ม submit
 checkFormValid();
