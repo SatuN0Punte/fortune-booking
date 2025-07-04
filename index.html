@@ -104,16 +104,10 @@
     cursor: pointer;
     transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
   }
-  button#submitBtn:hover:not(:disabled) {
+  button#submitBtn:hover {
     background: var(--color-gold);
     color: #000;
     box-shadow: 0 6px 20px rgba(255, 215, 0, 0.8);
-  }
-  button#submitBtn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    box-shadow: none;
-    color: #666;
   }
 
   /* Loader */
@@ -157,8 +151,8 @@
     padding: 18px 22px;
     border-radius: var(--border-radius);
     font-size: 1.05rem;
-    white-space: pre-wrap;
     word-break: break-word;
+    white-space: pre-line; /* เพื่อขึ้นบรรทัดใหม่ */
   }
   button#bookAgainBtn {
     background: var(--color-gold);
@@ -205,10 +199,6 @@
         <label for="phone">เบอร์โทร</label>
         <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
       </div>
-      <div>
-        <label for="lineId">Line ID</label>
-        <input type="text" id="lineId" name="lineId" placeholder="Line ID ของคุณ" />
-      </div>
 
       <div class="datetime-group">
         <div>
@@ -223,7 +213,7 @@
         </div>
       </div>
 
-      <button type="submit" id="submitBtn" disabled>จองคิว</button>
+      <button type="submit" id="submitBtn">จองคิว</button>
       <div id="loader" class="loader"></div>
     </form>
 
@@ -235,7 +225,6 @@
 
   <script>
     const form = document.getElementById('bookingForm');
-    const submitBtn = document.getElementById('submitBtn');
     const loader = document.getElementById('loader');
     const confirmation = document.getElementById('confirmation');
     const confirmDetails = document.getElementById('confirmDetails');
@@ -243,68 +232,19 @@
     const timeSelect = document.getElementById('time');
     const dateInput = document.getElementById('date');
 
-    function validateForm() {
-      const name = form.name.value.trim();
-      const phone = form.phone.value.trim();
-      const date = form.date.value;
-      const time = form.time.value;
-
-      // เช็ค pattern เบอร์โทร
-      const phoneValid = /^[0-9]{9,10}$/.test(phone);
-
-      if(name && phoneValid && date && time) {
-        submitBtn.disabled = false;
-      } else {
-        submitBtn.disabled = true;
-      }
-    }
-
-    form.name.addEventListener('input', validateForm);
-    form.phone.addEventListener('input', validateForm);
-    dateInput.addEventListener('change', () => {
-      validateForm();
-      loader.classList.add('visible');
-      timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
-
-      // ตัวอย่างจำลองโหลดเวลาว่างจาก API
-      setTimeout(() => {
-        loader.classList.remove('visible');
-        timeSelect.innerHTML = `
-          <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
-          <option value="10:00">10:00</option>
-          <option value="10:30">10:30</option>
-          <option value="11:00">11:00</option>
-        `;
-        validateForm();
-      }, 1000);
-    });
-    timeSelect.addEventListener('change', validateForm);
-
-    submitBtn.disabled = true; // เริ่มต้นปิดปุ่ม
-
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      submitBtn.disabled = true;
       loader.classList.add('visible');
-
-      const name = form.name.value.trim();
-      const phone = form.phone.value.trim();
-      const lineId = form.lineId.value.trim() || '-';
-      const date = form.date.value;
-      const time = form.time.value;
-
-      // ตัวอย่างหน่วงเวลา API
-      setTimeout(() => {
+      // TODO: เชื่อม API /bookQueue ที่นี่
+      setTimeout(() => { // ตัวอย่างจำลองเวลา API ตอบ
         loader.classList.remove('visible');
         form.style.display = 'none';
         confirmation.classList.add('visible');
         confirmDetails.textContent = `
-ชื่อ: ${name}
-เบอร์โทร: ${phone}
-Line ID: ${lineId}
-วันที่: ${date}
-เวลา: ${time}
+          ชื่อ: ${form.name.value}
+          เบอร์โทร: ${form.phone.value}
+          วันที่: ${form.date.value}
+          เวลา: ${form.time.value}
         `;
       }, 1500);
     });
@@ -314,7 +254,21 @@ Line ID: ${lineId}
       form.style.display = '';
       form.reset();
       timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
-      submitBtn.disabled = true;
+    });
+
+    dateInput.addEventListener('change', async () => {
+      loader.classList.add('visible');
+      timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
+      // TODO: ดึงเวลาว่างจริงจาก API /checkAvailable
+      setTimeout(() => { // ตัวอย่างจำลองโหลดเวลา
+        loader.classList.remove('visible');
+        timeSelect.innerHTML = `
+          <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+          <option value="10:00">10:00</option>
+          <option value="10:30">10:30</option>
+          <option value="11:00">11:00</option>
+        `;
+      }, 1000);
     });
   </script>
 </body>
