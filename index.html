@@ -1,92 +1,81 @@
-<!-- ✅ FORM: ไม่มี Line ID + ป้องกันข้อมูลว่าง -->
-<form id="bookingForm" autocomplete="off" novalidate>
-  <div>
-    <label for="name">ชื่อ-นามสกุล</label>
-    <input type="text" id="name" name="name" placeholder="กรอกชื่อเต็มของคุณ" required />
-  </div>
-  <div>
-    <label for="phone">เบอร์โทร</label>
-    <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
-  </div>
+const form = document.getElementById('bookingForm');
+const submitBtn = document.getElementById('submitBtn');
+const loader = document.getElementById('loader');
+const confirmation = document.getElementById('confirmation');
+const confirmDetails = document.getElementById('confirmDetails');
+const bookAgainBtn = document.getElementById('bookAgainBtn');
+const timeSelect = document.getElementById('time');
+const dateInput = document.getElementById('date');
 
-  <div class="datetime-group">
-    <div>
-      <label for="date">วันที่</label>
-      <input type="date" id="date" name="date" required />
-    </div>
-    <div>
-      <label for="time">เวลา</label>
-      <select id="time" name="time" required>
-        <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
-      </select>
-    </div>
-  </div>
+function validateForm() {
+  const name = form.name.value.trim();
+  const phone = form.phone.value.trim();
+  const date = form.date.value;
+  const time = form.time.value;
 
-  <button type="submit" id="submitBtn">จองคิว</button>
-  <div id="loader" class="loader"></div>
-</form>
+  // เช็คว่าค่าครบและเบอร์โทรถูก pattern
+  const phoneValid = /^[0-9]{9,10}$/.test(phone);
 
-<section id="confirmation" aria-live="polite" role="region" aria-atomic="true">
-  <div id="confirmDetails"></div>
-  <button id="bookAgainBtn" type="button">จองคิวใหม่</button>
-</section>
+  if(name && phoneValid && date && time) {
+    submitBtn.disabled = false;
+  } else {
+    submitBtn.disabled = true;
+  }
+}
 
-<script>
-  const form = document.getElementById('bookingForm');
-  const loader = document.getElementById('loader');
-  const confirmation = document.getElementById('confirmation');
-  const confirmDetails = document.getElementById('confirmDetails');
-  const bookAgainBtn = document.getElementById('bookAgainBtn');
-  const timeSelect = document.getElementById('time');
-  const dateInput = document.getElementById('date');
+// เรียก validate ทุกครั้งที่มีการเปลี่ยนแปลงข้อมูล
+form.name.addEventListener('input', validateForm);
+form.phone.addEventListener('input', validateForm);
+dateInput.addEventListener('change', () => {
+  validateForm();
+  // โหลดเวลาว่าง (จำลอง)
+  loader.classList.add('visible');
+  timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  setTimeout(() => {
+    loader.classList.remove('visible');
+    timeSelect.innerHTML = `
+      <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+      <option value="10:00">10:00</option>
+      <option value="10:30">10:30</option>
+      <option value="11:00">11:00</option>
+    `;
+    validateForm(); // ตรวจสอบอีกครั้งหลังโหลดเวลา
+  }, 1000);
+});
+timeSelect.addEventListener('change', validateForm);
 
-    const name = form.name.value.trim();
-    const phone = form.phone.value.trim();
-    const date = form.date.value;
-    const time = form.time.value;
+// เริ่มด้วยปิดปุ่ม
+submitBtn.disabled = true;
 
-    if (!name || !phone || !date || !time) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
-      return;
-    }
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    loader.classList.add('visible');
+  submitBtn.disabled = true; // ปิดปุ่มเพื่อกันกดซ้ำ
+  loader.classList.add('visible');
 
-    setTimeout(() => {
-      loader.classList.remove('visible');
-      form.style.display = 'none';
-      confirmation.classList.add('visible');
-      confirmDetails.textContent = `
-        ชื่อ: ${name}
-        เบอร์โทร: ${phone}
-        วันที่: ${date}
-        เวลา: ${time}
-      `;
-    }, 1500);
-  });
+  const name = form.name.value.trim();
+  const phone = form.phone.value.trim();
+  const date = form.date.value;
+  const time = form.time.value;
 
-  bookAgainBtn.addEventListener('click', () => {
-    confirmation.classList.remove('visible');
-    form.style.display = '';
-    form.reset();
-    timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
-  });
+  setTimeout(() => {
+    loader.classList.remove('visible');
+    form.style.display = 'none';
+    confirmation.classList.add('visible');
+    confirmDetails.textContent = `
+      ชื่อ: ${name}
+      เบอร์โทร: ${phone}
+      วันที่: ${date}
+      เวลา: ${time}
+    `;
+  }, 1500);
+});
 
-  dateInput.addEventListener('change', async () => {
-    loader.classList.add('visible');
-    timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
-
-    setTimeout(() => {
-      loader.classList.remove('visible');
-      timeSelect.innerHTML = `
-        <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
-        <option value="10:00">10:00</option>
-        <option value="10:30">10:30</option>
-        <option value="11:00">11:00</option>
-      `;
-    }, 1000);
-  });
-</script>
+bookAgainBtn.addEventListener('click', () => {
+  confirmation.classList.remove('visible');
+  form.style.display = '';
+  form.reset();
+  timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
+  submitBtn.disabled = true;
+});
