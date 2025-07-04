@@ -3,48 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <title>จองคิวดูดวงแม่มุกดา</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</h1>
+  <main>
+    <h1>จองคิวดูดวงแม่มุกดา</h1>
 
-    <form id="bookingForm" autocomplete="off" novalidate>
-      <div>
-        <label for="name">ชื่อ-นามสกุล
-          <input type="text" id="name" name="name" placeholder="กรอกชื่อเต็มของคุณ" required />
-        </label>
-      </div>
-      <div>
-        <label for="phone">เบอร์โทร
-          <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
-        </label>
-      </div>
+    <form id="bookingForm">
+      <label for="name">ชื่อ-สกุล</label>
+      <input type="text" id="name" name="name" placeholder="กรอกชื่อของคุณ" required />
+
+      <label for="phone">เบอร์โทรศัพท์</label>
+      <input type="tel" id="phone" name="phone" placeholder="กรอกเบอร์โทร 9-10 หลัก" pattern="[0-9]{9,10}" required />
 
       <div class="datetime-group">
-        <div>
-          <label for="date">วันที่
-            <input type="date" id="date" name="date" required />
-          </label>
-        </div>
-        <div>
-          <label for="time">เวลา
-            <select id="time" name="time" required>
-              <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
-            </select>
-          </label>
-        </div>
+        <label for="date">วันที่ต้องการจอง
+          <input type="date" id="date" name="date" required min="" />
+        </label>
+
+        <label for="time">เวลาว่าง
+          <select id="time" name="time" required>
+            <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+          </select>
+        </label>
       </div>
 
-      <button type="submit" id="submitBtn" disabled>จองคิว</button>
-      <div id="loader" class="loader"></div>
+      <button id="submitBtn" type="submit" disabled>จองคิว</button>
     </form>
 
-    <section id="confirmation" aria-live="polite" role="region" aria-atomic="true">
-      <div id="confirmDetails"></div>
-      <button id="bookAgainBtn" type="button">จองคิวใหม่</button>
+    <div id="loader" class="hidden">กำลังโหลด...</div>
+
+    <section id="confirmation" class="hidden">
+      <h2>จองคิวสำเร็จ!</h2>
+      <pre id="confirmDetails"></pre>
+      <button id="bookAgainBtn">จองใหม่</button>
     </section>
   </main>
 
