@@ -13,7 +13,6 @@ const submitBtn = document.getElementById('submitBtn');
 const nameInput = document.getElementById('name');
 const phoneInput = document.getElementById('phone');
 
-// ฟังก์ชันตรวจสอบฟอร์มครบถ้วน
 function checkFormValid() {
   const nameValid = nameInput.value.trim() !== '';
   const phoneValid = /^[0-9]{9,10}$/.test(phoneInput.value);
@@ -23,13 +22,11 @@ function checkFormValid() {
   submitBtn.disabled = !(nameValid && phoneValid && dateValid && timeValid);
 }
 
-// ตรวจสอบฟอร์มทุกช่องเมื่อมีการพิมพ์หรือเปลี่ยนแปลง
 [nameInput, phoneInput, dateInput, timeSelect].forEach(el => {
   el.addEventListener('input', checkFormValid);
   el.addEventListener('change', checkFormValid);
 });
 
-// โหลดเวลาว่างจาก API
 dateInput.addEventListener('change', async () => {
   if (!dateInput.value) return;
   loader.classList.add('visible');
@@ -63,7 +60,6 @@ dateInput.addEventListener('change', async () => {
   checkFormValid();
 });
 
-// ส่งข้อมูลจองคิว
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   submitBtn.disabled = true;
@@ -102,7 +98,6 @@ form.addEventListener('submit', async (e) => {
   submitBtn.disabled = false;
 });
 
-// ปุ่มจองใหม่
 bookAgainBtn.addEventListener('click', () => {
   confirmation.classList.remove('visible');
   form.style.display = '';
@@ -111,5 +106,4 @@ bookAgainBtn.addEventListener('click', () => {
   submitBtn.disabled = true;
 });
 
-// เริ่มต้นปิดปุ่ม submit
 checkFormValid();
