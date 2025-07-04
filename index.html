@@ -1,336 +1,45 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</title>
-<link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
-<style>
-  :root {
-    --color-primary: #1A237E;
-    --color-accent: #6A1B9A;
-    --color-gold: #FFD700;
-    --color-bg: #F9F9FA;
-    --color-text: #222;
-    --border-radius: 12px;
-    --transition-speed: 0.3s;
-  }
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0; padding: 24px 12px;
-    font-family: 'Prompt', sans-serif;
-    background: var(--color-bg);
-    color: var(--color-text);
-    display: flex;
-    justify-content: center;
-    min-height: 100vh;
-  }
-  .container {
-    max-width: 420px;
-    width: 100%;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow:
-      0 2px 6px rgba(26, 35, 126, 0.12),
-      0 6px 12px rgba(106, 27, 154, 0.12);
-    padding: 32px 28px;
-    display: flex;
-    flex-direction: column;
-  }
-  h1 {
-    margin: 0 0 24px 0;
-    font-weight: 700;
-    font-size: 1.9rem;
-    color: var(--color-primary);
-    text-align: center;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  label {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--color-primary);
-    margin-bottom: 6px;
-    display: block;
-  }
-  input[type="text"],
-  input[type="tel"],
-  input[type="date"],
-  select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1.8px solid #ccc;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    color: var(--color-text);
-    background: #fff;
-    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-  }
-  input[type="text"]:focus,
-  input[type="tel"]:focus,
-  input[type="date"]:focus,
-  select:focus {
-    outline: none;
-    border-color: var(--color-gold);
-    box-shadow: 0 0 8px var(--color-gold);
-  }
-
-  .datetime-group {
-    display: flex;
-    gap: 16px;
-  }
-  .datetime-group > div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  button#submitBtn {
-    margin-top: 12px;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-    border: none;
-    border-radius: var(--border-radius);
-    padding: 14px 0;
-    color: #fff;
-    font-weight: 700;
-    font-size: 1.2rem;
-    box-shadow: 0 5px 12px rgba(106, 27, 154, 0.5);
-    cursor: pointer;
-    transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-  }
-  button#submitBtn:hover {
-    background: var(--color-gold);
-    color: #000;
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.8);
-  }
-
-  .loader {
-    margin: 18px auto 0;
-    border: 4px solid #eee;
-    border-top: 4px solid var(--color-primary);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    animation: spin 1s linear infinite;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-  .loader.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  #confirmation {
-    margin-top: 28px;
-    text-align: center;
-    color: var(--color-primary);
-    font-weight: 600;
-    display: none;
-    flex-direction: column;
-    gap: 14px;
-  }
-  #confirmation.visible {
-    display: flex;
-  }
-  #confirmDetails {
-    border: 1.5px solid var(--color-accent);
-    background: #f3e9ff;
-    padding: 18px 22px;
-    border-radius: var(--border-radius);
-    font-size: 1.05rem;
-    white-space: pre-line;
-    word-break: break-word;
-  }
-  button#bookAgainBtn {
-    background: var(--color-gold);
-    border: none;
-    border-radius: var(--border-radius);
-    padding: 12px 28px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  button#bookAgainBtn:hover {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  @media (max-width: 480px) {
-    .datetime-group {
-      flex-direction: column;
-    }
-    .container {
-      padding: 24px 20px;
-    }
-    h1 {
-      font-size: 1.6rem;
-    }
-    button#submitBtn {
-      font-size: 1.1rem;
-    }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>จองคิวดูดวงแม่มุกดา</title>
 </head>
 <body>
-  <main class="container">
-    <h1>จองคิวดูดวงกับแม่มุกดา ตาทิพย์</h1>
-
-    <form id="bookingForm" autocomplete="off" novalidate>
-      <div>
-        <label for="name">ชื่อ-นามสกุล</label>
-        <input type="text" id="name" name="name" placeholder="กรอกชื่อเต็มของคุณ" required />
-      </div>
-      <div>
-        <label for="phone">เบอร์โทร</label>
-        <input type="tel" id="phone" name="phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
-      </div>
-      <div>
-        <label for="lineId">Line ID</label>
-        <input type="text" id="lineId" name="lineId" placeholder="Line ID ของคุณ" required />
-      </div>
-
-      <div class="datetime-group">
-        <div>
-          <label for="date">วันที่</label>
-          <input type="date" id="date" name="date" required />
-        </div>
-        <div>
-          <label for="time">เวลา</label>
-          <select id="time" name="time" required>
-            <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
-          </select>
-        </div>
-      </div>
-
-      <button type="submit" id="submitBtn">จองคิว</button>
-      <div id="loader" class="loader" aria-hidden="true"></div>
-    </form>
-
-    <section id="confirmation" aria-live="polite" role="region" aria-atomic="true">
-      <div id="confirmDetails"></div>
-      <button id="bookAgainBtn" type="button">จองคิวใหม่</button>
-    </section>
-  </main>
+  <h1>ฟอร์มจองคิว</h1>
+  <form id="bookingForm">
+    <label>ชื่อ:</label><br>
+    <input type="text" name="name" required /><br />
+    <label>เบอร์โทร:</label><br>
+    <input type="tel" name="phone" required /><br />
+    <label>วันที่:</label><br>
+    <input type="date" name="date" required /><br />
+    <label>เวลา:</label><br>
+    <input type="time" name="time" required /><br /><br />
+    <button type="submit">จองคิว</button>
+  </form>
+  <div id="result"></div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL/exec";
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzVjgsGv5g_8zdTV_f5kEDL9yhzCkvmxD9aImMjrCaujhj0le9uA0uHTgPus_ImL1aK/exec';
 
     const form = document.getElementById('bookingForm');
-    const loader = document.getElementById('loader');
-    const confirmation = document.getElementById('confirmation');
-    const confirmDetails = document.getElementById('confirmDetails');
-    const bookAgainBtn = document.getElementById('bookAgainBtn');
-    const timeSelect = document.getElementById('time');
-    const dateInput = document.getElementById('date');
-
-    // ฟังก์ชันโหลดเวลาว่างจาก API
-    async function fetchAvailableTimes(date) {
-      if (!date) return [];
-      try {
-        const res = await fetch(`${API_URL}?action=checkAvailable&date=${date}`);
-        const data = await res.json();
-        if (data.success && Array.isArray(data.availableTimes)) {
-          return data.availableTimes;
-        }
-        return [];
-      } catch (err) {
-        console.error('Error fetching available times:', err);
-        return [];
-      }
-    }
-
-    // อัพเดตเวลาว่างเมื่อเปลี่ยนวัน
-    dateInput.addEventListener('change', async () => {
-      loader.classList.add('visible');
-      timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
-
-      const date = dateInput.value;
-      const availableTimes = await fetchAvailableTimes(date);
-
-      if (availableTimes.length === 0) {
-        timeSelect.innerHTML = '<option disabled selected>ไม่มีเวลาว่างในวันเลือก</option>';
-      } else {
-        timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
-        availableTimes.forEach(time => {
-          const option = document.createElement('option');
-          option.value = time;
-          option.textContent = time;
-          timeSelect.appendChild(option);
-        });
-      }
-      loader.classList.remove('visible');
-    });
-
-    form.addEventListener('submit', async e => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // ตรวจสอบข้อมูลครบถ้วนอีกที
-      const name = form.name.value.trim();
-      const phone = form.phone.value.trim();
-      const lineId = form.lineId.value.trim();
-      const date = form.date.value;
-      const time = form.time.value;
+      const data = {
+        name: form.name.value,
+        phone: form.phone.value,
+        date: form.date.value,
+        time: form.time.value,
+      };
 
-      if (!name || !phone || !lineId || !date || !time) {
-        alert('❌ กรุณากรอกข้อมูลให้ครบก่อนกดจองคิว');
-        return;
-      }
+      const response = await fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
 
-      loader.classList.add('visible');
-
-      const dateTime = `${date}T${time}:00+07:00`; // timezone +7
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'bookQueue',
-            booking: { name, phone, lineId, dateTime, note: '' }
-          })
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-          // แสดงผลคอนเฟิร์ม
-          form.style.display = 'none';
-          confirmation.classList.add('visible');
-          confirmDetails.textContent = `
-ชื่อ: ${name}
-เบอร์โทร: ${phone}
-Line ID: ${lineId}
-วันที่: ${date}
-เวลา: ${time}
-ข้อความ: ${data.message || 'จองคิวสำเร็จ'}
-          `.trim();
-        } else {
-          alert(data.message || 'เกิดข้อผิดพลาดในการจองคิว');
-        }
-      } catch (error) {
-        alert('🚫 ไม่สามารถเชื่อมต่อระบบจองได้ กรุณาลองใหม่อีกครั้ง');
-        console.error(error);
-      } finally {
-        loader.classList.remove('visible');
-      }
-    });
-
-    bookAgainBtn.addEventListener('click', () => {
-      confirmation.classList.remove('visible');
-      form.style.display = '';
-      form.reset();
-      timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
+      const result = await response.json();
+      document.getElementById('result').innerText = result.message;
     });
   </script>
 </body>
