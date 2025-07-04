@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --color-primary: #1A237E;
-    --color-accent: #6A1B9A;
-    --color-gold: #FFD700;
+    --color-primary: #1A237E;   /* น้ำเงินเข้ม */
+    --color-accent: #6A1B9A;    /* ม่วง */
+    --color-gold: #FFD700;      /* ทอง */
     --color-bg: #F9F9FA;
     --color-text: #222;
     --border-radius: 12px;
@@ -80,6 +80,7 @@
     box-shadow: 0 0 8px var(--color-gold);
   }
 
+  /* Date & Time side by side */
   .datetime-group {
     display: flex;
     gap: 16px;
@@ -109,6 +110,7 @@
     box-shadow: 0 6px 20px rgba(255, 215, 0, 0.8);
   }
 
+  /* Loader */
   .loader {
     margin: 18px auto 0;
     border: 4px solid #eee;
@@ -130,6 +132,7 @@
     100% { transform: rotate(360deg); }
   }
 
+  /* Confirmation */
   #confirmation {
     margin-top: 28px;
     text-align: center;
@@ -148,7 +151,6 @@
     padding: 18px 22px;
     border-radius: var(--border-radius);
     font-size: 1.05rem;
-    white-space: pre-line;
     word-break: break-word;
   }
   button#bookAgainBtn {
@@ -166,6 +168,7 @@
     color: #fff;
   }
 
+  /* Responsive */
   @media (max-width: 480px) {
     .datetime-group {
       flex-direction: column;
@@ -197,7 +200,7 @@
       </div>
       <div>
         <label for="lineId">Line ID</label>
-        <input type="text" id="lineId" name="lineId" placeholder="Line ID ของคุณ" required />
+        <input type="text" id="lineId" name="lineId" placeholder="Line ID ของคุณ" />
       </div>
 
       <div class="datetime-group">
@@ -214,7 +217,7 @@
       </div>
 
       <button type="submit" id="submitBtn">จองคิว</button>
-      <div id="loader" class="loader" aria-hidden="true"></div>
+      <div id="loader" class="loader"></div>
     </form>
 
     <section id="confirmation" aria-live="polite" role="region" aria-atomic="true">
@@ -224,8 +227,6 @@
   </main>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL/exec";
-
     const form = document.getElementById('bookingForm');
     const loader = document.getElementById('loader');
     const confirmation = document.getElementById('confirmation');
@@ -234,96 +235,22 @@
     const timeSelect = document.getElementById('time');
     const dateInput = document.getElementById('date');
 
-    // ฟังก์ชันโหลดเวลาว่างจาก API
-    async function fetchAvailableTimes(date) {
-      if (!date) return [];
-      try {
-        const res = await fetch(`${API_URL}?action=checkAvailable&date=${date}`);
-        const data = await res.json();
-        if (data.success && Array.isArray(data.availableTimes)) {
-          return data.availableTimes;
-        }
-        return [];
-      } catch (err) {
-        console.error('Error fetching available times:', err);
-        return [];
-      }
-    }
-
-    // อัพเดตเวลาว่างเมื่อเปลี่ยนวัน
-    dateInput.addEventListener('change', async () => {
-      loader.classList.add('visible');
-      timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
-
-      const date = dateInput.value;
-      const availableTimes = await fetchAvailableTimes(date);
-
-      if (availableTimes.length === 0) {
-        timeSelect.innerHTML = '<option disabled selected>ไม่มีเวลาว่างในวันเลือก</option>';
-      } else {
-        timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
-        availableTimes.forEach(time => {
-          const option = document.createElement('option');
-          option.value = time;
-          option.textContent = time;
-          timeSelect.appendChild(option);
-        });
-      }
-      loader.classList.remove('visible');
-    });
-
-    form.addEventListener('submit', async e => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      // ตรวจสอบข้อมูลครบถ้วนอีกที
-      const name = form.name.value.trim();
-      const phone = form.phone.value.trim();
-      const lineId = form.lineId.value.trim();
-      const date = form.date.value;
-      const time = form.time.value;
-
-      if (!name || !phone || !lineId || !date || !time) {
-        alert('❌ กรุณากรอกข้อมูลให้ครบก่อนกดจองคิว');
-        return;
-      }
-
       loader.classList.add('visible');
-
-      const dateTime = `${date}T${time}:00+07:00`; // timezone +7
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'bookQueue',
-            booking: { name, phone, lineId, dateTime, note: '' }
-          })
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-          // แสดงผลคอนเฟิร์ม
-          form.style.display = 'none';
-          confirmation.classList.add('visible');
-          confirmDetails.textContent = `
-ชื่อ: ${name}
-เบอร์โทร: ${phone}
-Line ID: ${lineId}
-วันที่: ${date}
-เวลา: ${time}
-ข้อความ: ${data.message || 'จองคิวสำเร็จ'}
-          `.trim();
-        } else {
-          alert(data.message || 'เกิดข้อผิดพลาดในการจองคิว');
-        }
-      } catch (error) {
-        alert('🚫 ไม่สามารถเชื่อมต่อระบบจองได้ กรุณาลองใหม่อีกครั้ง');
-        console.error(error);
-      } finally {
+      // TODO: เชื่อม API /bookQueue ที่นี่
+      setTimeout(() => { // ตัวอย่างจำลองเวลา API ตอบ
         loader.classList.remove('visible');
-      }
+        form.style.display = 'none';
+        confirmation.classList.add('visible');
+        confirmDetails.textContent = `
+          ชื่อ: ${form.name.value}
+          เบอร์โทร: ${form.phone.value}
+          Line ID: ${form.lineId.value || '-'}
+          วันที่: ${form.date.value}
+          เวลา: ${form.time.value}
+        `;
+      }, 1500);
     });
 
     bookAgainBtn.addEventListener('click', () => {
@@ -331,6 +258,21 @@ Line ID: ${lineId}
       form.style.display = '';
       form.reset();
       timeSelect.innerHTML = '<option value="" disabled selected>เลือกเวลาที่ว่าง</option>';
+    });
+
+    dateInput.addEventListener('change', async () => {
+      loader.classList.add('visible');
+      timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
+      // TODO: ดึงเวลาว่างจริงจาก API /checkAvailable
+      setTimeout(() => { // ตัวอย่างจำลองโหลดเวลา
+        loader.classList.remove('visible');
+        timeSelect.innerHTML = `
+          <option value="" disabled selected>เลือกเวลาที่ว่าง</option>
+          <option value="10:00">10:00</option>
+          <option value="10:30">10:30</option>
+          <option value="11:00">11:00</option>
+        `;
+      }, 1000);
     });
   </script>
 </body>
