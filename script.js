@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbwF_9FGfNK69BUztpcgj1LqN4u6SBBbqmlhEnWvEZlS0JJusHH91q-Z4rH4RaUG6BLCHg/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbxPi9s7qb09ltC7FmbfK92jTE7UCpep9nfYYG1rDcqv7o7p01gAhIgtkck4CcjSFkIGNg/exec',
 };
 
 const form = document.getElementById('bookingForm');
@@ -13,6 +13,7 @@ const submitBtn = document.getElementById('submitBtn');
 const nameInput = document.getElementById('name');
 const phoneInput = document.getElementById('phone');
 
+// ฟังก์ชันตรวจสอบฟอร์มครบถ้วน
 function checkFormValid() {
   const nameValid = nameInput.value.trim() !== '';
   const phoneValid = /^[0-9]{9,10}$/.test(phoneInput.value);
@@ -22,18 +23,24 @@ function checkFormValid() {
   submitBtn.disabled = !(nameValid && phoneValid && dateValid && timeValid);
 }
 
+// ตรวจสอบฟอร์มทุกช่องเมื่อมีการพิมพ์หรือเปลี่ยนแปลง
 [nameInput, phoneInput, dateInput, timeSelect].forEach(el => {
   el.addEventListener('input', checkFormValid);
   el.addEventListener('change', checkFormValid);
 });
 
+// โหลดเวลาว่างจาก API (ใช้ POST แก้ปัญหา CORS)
 dateInput.addEventListener('change', async () => {
   if (!dateInput.value) return;
   loader.classList.add('visible');
   timeSelect.innerHTML = '<option disabled>กำลังโหลดเวลาว่าง...</option>';
 
   try {
-    const response = await fetch(`${CONFIG.API_URL}?action=getAvailableSlots&date=${dateInput.value}`);
+    const response = await fetch(CONFIG.API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'getAvailableSlots', date: dateInput.value }),
+    });
     const data = await response.json();
 
     if (data.status === 'success') {
@@ -60,6 +67,7 @@ dateInput.addEventListener('change', async () => {
   checkFormValid();
 });
 
+// ส่งข้อมูลจองคิว (POST เหมือนเดิม)
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   submitBtn.disabled = true;
@@ -98,6 +106,7 @@ form.addEventListener('submit', async (e) => {
   submitBtn.disabled = false;
 });
 
+// ปุ่มจองใหม่
 bookAgainBtn.addEventListener('click', () => {
   confirmation.classList.remove('visible');
   form.style.display = '';
@@ -106,4 +115,5 @@ bookAgainBtn.addEventListener('click', () => {
   submitBtn.disabled = true;
 });
 
+// เริ่มต้นปิดปุ่ม submit
 checkFormValid();
